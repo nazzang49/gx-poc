@@ -1,0 +1,115 @@
+config_version: 3.0
+
+# Datasources tell Great Expectations where your data lives and how to get it.
+# You can use the CLI command `great_expectations datasource new` to help you
+# add a new datasource. Read more at https://docs.greatexpectations.io/en/latest/reference/core_concepts/datasource.html
+datasources: {}
+
+config_variables_file_path: uncommitted/config_variables.yml
+
+# The plugins_directory will be added to your python path for custom modules
+# used to override and extend Great Expectations.
+plugins_directory: plugins/
+
+stores:
+  # Stores are configurable places to store things like Expectations, Validations
+  # Data Docs, and more. These are for advanced users only - most users can simply
+  # leave this section alone.
+  #
+  # Three stores are required: expectations, validations, and
+  # evaluation_parameters, and must exist with a valid store entry. Additional
+  # stores can be configured for uses such as data_docs, etc.
+  expectations_store:
+    class_name: ExpectationsStore
+    store_backend:
+      class_name: TupleFilesystemStoreBackend
+      base_directory: expectations/
+
+  # <snippet name="tests/integration/fixtures/gcp_deployment/great_expectations/great_expectations.yml expectations_GCS_store">
+  expectations_GCS_store:
+    class_name: ExpectationsStore
+    store_backend:
+      class_name: TupleGCSStoreBackend
+      project: my-proj-414213
+      bucket: jyp-bucket
+      prefix: expectations
+  # </snippet>
+
+  validations_store:
+    class_name: ValidationsStore
+    store_backend:
+      class_name: TupleFilesystemStoreBackend
+      base_directory: uncommitted/validations/
+
+  # <snippet name="tests/integration/fixtures/gcp_deployment/great_expectations/great_expectations.yml validations_GCS_store">
+  validations_GCS_store:
+    class_name: ValidationsStore
+    store_backend:
+      class_name: TupleGCSStoreBackend
+      project: my-proj-414213
+      bucket: jyp-bucket
+      prefix: validations
+  # </snippet>
+
+  evaluation_parameter_store:
+    class_name: EvaluationParameterStore
+  checkpoint_store:
+    class_name: CheckpointStore
+    store_backend:
+      class_name: TupleFilesystemStoreBackend
+      suppress_store_backend_id: true
+      base_directory: checkpoints/
+
+# <snippet name="tests/integration/fixtures/gcp_deployment/great_expectations/great_expectations.yml expectations_store_name">
+expectations_store_name: expectations_GCS_store
+# </snippet>
+# <snippet name="tests/integration/fixtures/gcp_deployment/great_expectations/great_expectations.yml validations_store_name">
+validations_store_name: validations_GCS_store
+# </snippet>
+evaluation_parameter_store_name: evaluation_parameter_store
+checkpoint_store_name: checkpoint_store
+
+data_docs_sites:
+  # Data Docs make it simple to visualize data quality in your project. These
+  # include Expectations, Validations & Profiles. They are built for all
+  # Datasources from JSON artifacts in the local repo including validations &
+  # profiles from the uncommitted directory. Read more at https://docs.greatexpectations.io/en/latest/reference/core_concepts/data_docs.html
+  local_site:
+    class_name: SiteBuilder
+    show_how_to_buttons: true
+    store_backend:
+      class_name: TupleFilesystemStoreBackend
+      base_directory: uncommitted/data_docs/local_site/
+    site_index_builder:
+      class_name: DefaultSiteIndexBuilder
+  # <snippet name="tests/integration/fixtures/gcp_deployment/great_expectations/great_expectations.yml gs_site">
+  gs_site:
+    class_name: SiteBuilder
+    store_backend:
+      class_name: TupleGCSStoreBackend
+      project: my-proj-414213
+      bucket: jyp-bucket
+    site_index_builder:
+      class_name: DefaultSiteIndexBuilder
+# </snippet>
+
+anonymous_usage_statistics:
+  data_context_id: b9b23461-53c3-4490-a09e-fbe12984c25a
+  enabled: true
+  usage_statistics_url: https://dev.stats.greatexpectations.io/great_expectations/v1/usage_statistics
+fluent_datasources:
+  my_bigquery_datasource:
+    type: sql
+    assets:
+      my_table_table_asset:
+        type: table
+        order_by: []
+        batch_metadata: {}
+        table_name: my_table
+        schema_name:
+    connection_string: bigquery://my-proj-414213/tmp
+notebooks:
+include_rendered_content:
+  globally: false
+  expectation_suite: false
+  expectation_validation_result: false
