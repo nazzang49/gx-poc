@@ -1,4 +1,7 @@
 import great_expectations as gx
+from great_expectations.core.batch import BatchRequest
+from great_expectations.dataset import Dataset
+from great_expectations.profile.user_configurable_profiler import UserConfigurableProfiler
 
 # -- read default context from great_expectations.yml
 context = gx.get_context()
@@ -8,19 +11,27 @@ context = gx.get_context()
 # suite = context.get_expectation_suite("my_suite")
 # print(suite)
 
-# datasource = context.sources.add_or_update_sql(
-#     name="my_bigquery_datasource",
-#     connection_string="bigquery://my-proj-414213/tmp",
-# )
+datasource = context.sources.add_or_update_sql(
+    name="my_bigquery_datasource",
+    connection_string="bigquery://my-proj-414213/tmp",
+)
 
 # TODO 1. table asset
-# table_asset = datasource.add_table_asset(name="my_table_table_asset", table_name="my_table")
+table_asset = datasource.add_table_asset(name="my_table_table_asset", table_name="my_table")
 
-# TODO 2. query asset
+# TODO 2. query asset >> input {{ ds }} in where from parameters
 # query_asset = datasource.add_query_asset(name="my_table_query_asset", query="select * from my_table limit 1")
 
 # -- create batch from asset
-# request = table_asset.build_batch_request()
+request = table_asset.build_batch_request()
+
+# TODO [Optional] profiling >> apply to custom operator in airflow
+# validator = context.get_validator(
+#     batch_request=request
+# )
+# profiler = UserConfigurableProfiler(profile_dataset=validator)
+# profiled_suite = profiler.build_suite()
+# print(profiled_suite)
 
 # -- create expectation suite and validator
 # context.add_or_update_expectation_suite(expectation_suite_name="my_suite")
